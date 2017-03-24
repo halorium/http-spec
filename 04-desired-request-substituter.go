@@ -1,15 +1,20 @@
 package main
 
-func desiredRequestSubstitor(context *context) {
-	context.log("04 desired-request-substituter")
+import (
+	"github.com/tmornini/http-spec/logger"
+	"github.com/tmornini/http-spec/state"
+)
 
-	context.SpecTriplet.DesiredRequest.substitute(context)
+func desiredRequestSubstitor(state *state.State) {
+	logger.Log("04-desired-request-substituter")
 
-	if context.SpecTriplet.isRequestOnly() {
-		desiredRequestSender(context)
+	state.Spec.DesiredRequest.substitute(state)
+
+	if state.Spec.isRequestOnly() {
+		desiredRequestSender(state)
 
 		return
 	}
 
-	expectedResponseMatchParser(context)
+	expectedResponseMatchParser(state)
 }

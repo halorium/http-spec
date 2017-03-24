@@ -1,47 +1,72 @@
 package main
 
 import (
-	"flag"
-	"sync"
-	"time"
+	"github.com/tmornini/http-spec/logger"
+	"github.com/tmornini/http-spec/state"
 )
 
 const regexpIdentifier = "⧆"
 const substitutionIdentifier = "⧈"
 
 func main() {
-	var prefix string
+	// var prefix string
 
-	startedAt := time.Now()
+	// startedAt := time.Now()
 
-	flag.StringVar(
-		&prefix,
-		"prefix",
-		"http://localhost:80",
-		"prefix for request URLs",
-	)
+	// flag.StringVar(
+	// 	&prefix,
+	// 	"prefix",
+	// 	"http://localhost:80",
+	// 	"prefix for request URLs",
+	// )
+	//
+	// flag.Parse()
 
-	flag.Parse()
+	// filePaths := []string{}
+	//
+	// for i, path := range os.Args {
+	// 	if i != 0 {
+	// 		filePaths = append(filePaths, path)
+	// 	}
+	// }
 
-	context := &context{
-		LogFunctions:          false,
-		LogContext:            false,
-		URLPrefix:             prefix,
-		Pathnames:             flag.Args(),
-		WaitGroup:             &sync.WaitGroup{},
-		ResultGathererChannel: make(chan context),
-		StartedAt:             startedAt,
-	}
+	// filePaths := os.Args[1]
 
-	context.log("00 main")
+	// fmt.Println(filePaths)
 
-	go resultGatherer(*context)
+	// fmt.Println(os.Args[1])
 
-	specFileScatter(context)
+	// fmt.Println(flag.Args())
 
-	context.WaitGroup.Wait()
+	state := state.New()
 
-	close(context.ResultGathererChannel)
+	// context := &context{
+	// 	LogFunctions:          false,
+	// 	Logcontext:              false,
+	// 	URLPrefix:             prefix,
+	// 	Pathnames:             flag.Args(),
+	// 	WaitGroup:             &sync.WaitGroup{},
+	// 	ResultGathererChannel: make(chan context),
+	// 	StartedAt:             startedAt,
+	// }
+
+	// pathnames := []string{}
+
+	// for i, path := range os.Args {
+	// 	if i != 0 {
+	// 		state.Pathnames = append(state.Pathnames, path)
+	// 	}
+	// }
+
+	logger.Log("00-main", state)
+
+	go resultGatherer(*state)
+
+	specFileScatter(state)
+
+	state.WaitGroup.Wait()
+
+	close(state.ResultGathererChannel)
 
 	select {}
 }

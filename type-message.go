@@ -1,9 +1,6 @@
 package main
 
-import (
-	"io"
-	"strings"
-)
+import "strings"
 
 type message struct {
 	FirstLine   *line
@@ -12,57 +9,57 @@ type message struct {
 	BodyLines   []*line
 }
 
-func messageFromFile(context *context) (*message, error) {
-	firstLine, err := newLineFromFile(context)
-
-	if err != nil {
-		return nil, err
-	}
-
-	var headerLine *line
-	var headerLines []*line
-	var emptyLine *line
-
-	for {
-		headerLine, err = newLineFromFile(context)
-
-		if err != nil {
-			return nil, err
-		}
-
-		if headerLine.isEmpty() {
-			emptyLine = headerLine
-
-			break
-		}
-
-		headerLines = append(headerLines, headerLine)
-	}
-
-	var bodyLine *line
-	var bodyLines []*line
-
-	for {
-		bodyLine, err = newLineFromFile(context)
-
-		if err == io.EOF || bodyLine.isBlank() {
-			break
-		}
-
-		if err != nil {
-			return nil, err
-		}
-
-		bodyLines = append(bodyLines, bodyLine)
-	}
-
-	return &message{
-		firstLine,
-		headerLines,
-		emptyLine,
-		bodyLines,
-	}, nil
-}
+// func messageFromFile(context *context) (*message, error) {
+// 	firstLine, err := newLineFromFile(context)
+//
+// 	if err != nil {
+// 		return nil, err
+// 	}
+//
+// 	var headerLine *line
+// 	var headerLines []*line
+// 	var emptyLine *line
+//
+// 	for {
+// 		headerLine, err = newLineFromFile(context)
+//
+// 		if err != nil {
+// 			return nil, err
+// 		}
+//
+// 		if headerLine.isEmpty() {
+// 			emptyLine = headerLine
+//
+// 			break
+// 		}
+//
+// 		headerLines = append(headerLines, headerLine)
+// 	}
+//
+// 	var bodyLine *line
+// 	var bodyLines []*line
+//
+// 	for {
+// 		bodyLine, err = newLineFromFile(context)
+//
+// 		if err == io.EOF || bodyLine.isBlank() {
+// 			break
+// 		}
+//
+// 		if err != nil {
+// 			return nil, err
+// 		}
+//
+// 		bodyLines = append(bodyLines, bodyLine)
+// 	}
+//
+// 	return &message{
+// 		firstLine,
+// 		headerLines,
+// 		emptyLine,
+// 		bodyLines,
+// 	}, nil
+// }
 
 func (message *message) allLines() []*line {
 	var allLines []*line

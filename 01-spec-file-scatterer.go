@@ -1,12 +1,17 @@
 package main
 
-func specFileScatter(context *context) {
-	context.log("01 spec-file-scatter")
+import (
+	"github.com/tmornini/http-spec/logger"
+	"github.com/tmornini/http-spec/state"
+)
 
-	for _, pathname := range context.Pathnames {
-		context.Pathname = pathname
+func specFileScatter(state *state.State) {
+	logger.Log("01-spec-file-scatter", state)
 
-		context.WaitGroup.Add(1)
-		go specFileProcessor(*context)
+	for _, pathname := range state.Pathnames {
+		state.Pathname = pathname
+
+		state.WaitGroup.Add(1)
+		go specFileProcessor(*state)
 	}
 }

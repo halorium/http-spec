@@ -1,33 +1,52 @@
 package main
 
-import "time"
+import (
+	"io"
+	"time"
 
-func specTripletIterator(context *context) {
-	context.log("03 spec-triplet-iterator")
+	"github.com/tmornini/http-spec/logger"
+	"github.com/tmornini/http-spec/request"
+	"github.com/tmornini/http-spec/response"
+	"github.com/tmornini/http-spec/spec"
+	"github.com/tmornini/http-spec/state"
+)
+
+func specTripletIterator(state *state.State) {
+	logger.Log("03-spec-triplet-iterator", state)
 
 	for {
-		context.Err = nil
+		state.Err = nil
 
-		desiredRequest, err := requestFromFile(context)
+		// desiredRequest, err := requestFromFile(state)
+		desiredRequest, err := request.New(state)
 
-		if errorHandler(context, err) {
+		if err != nil {
+			state.Err = err
+			state.ResultGathererChannel <- state
 			return
 		}
 
-		expectedResponse, err := responseFromFile(context)
+		// expectedResponse, err := responseFromFile(state)
+		expectedResponse, err := response.New(state)
 
-		if errorNotEOFHandler(context, err) {
+		if err != nil && err != io.EOF {
+			state.Err = err
+			state.ResultGathererChannel <- state
 			return
 		}
 
-		context.SpecTriplet = &specTriplet{
-			DesiredRequest:   desiredRequest,
-			ExpectedResponse: expectedResponse,
-		}
+		state.Spec = spec.New()
+		state.Spec.DesiredRequest = desiredRequest
+		state.Spec.ExpectedResponse = expectedResponse
 
-		desiredRequestSubstitor(context)
+		// state.SpecTriplet = &specTriplet{
+		// 	DesiredRequest:   desiredRequest,
+		// 	ExpectedResponse: expectedResponse,
+		// }
 
-		context.SpecTriplet.Duration = time.Since(context.SpecTriplet.StartedAt)
-		context.ResultGathererChannel <- *context
+		desiredRequestSubstitor(state)
+
+		state.Spec.Duration = time.Since(state.Spec.StartedAt)
+		state.ResultGathererChannel <- *state
 	}
 }

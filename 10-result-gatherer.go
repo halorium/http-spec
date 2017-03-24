@@ -17,17 +17,17 @@ func resultGatherer(context context) {
 
 	outputs := map[*big.Int]string{}
 
-	for completedContext := range context.ResultGathererChannel {
-		if completedContext.Err == nil {
+	for completedcontext := range context.ResultGathererChannel {
+		if completedcontext.Err == nil {
 			// SUCCESS
 			successCount++
-			outputs[completedContext.ID] +=
+			outputs[completedcontext.ID] +=
 				fmt.Sprintf(
 					"%s%s%s %s\n",
 					Green,
-					completedContext.SpecTriplet.String(),
+					completedcontext.SpecTriplet.String(),
 					Reset,
-					completedContext.SpecTriplet.Duration.String(),
+					completedcontext.SpecTriplet.Duration.String(),
 				)
 		} else {
 			// FAILURE
@@ -37,32 +37,32 @@ func resultGatherer(context context) {
 			location := ""
 			response := ""
 
-			if completedContext.File == nil {
+			if completedcontext.File == nil {
 				// file open failure
-				location += "[" + completedContext.Pathname + "]"
+				location += "[" + completedcontext.Pathname + "]"
 			} else {
-				if completedContext.SpecTriplet == nil {
+				if completedcontext.SpecTriplet == nil {
 					// request/response parsing failure
-					location += completedContext.File.String()
+					location += completedcontext.File.String()
 				} else {
 					// request/response matching failure
 					location +=
-						completedContext.SpecTriplet.String() + " " +
-							completedContext.SpecTriplet.Duration.String()
+						completedcontext.SpecTriplet.String() + " " +
+							completedcontext.SpecTriplet.Duration.String()
 
-					if completedContext.SpecTriplet.ActualResponse != nil {
-						response = completedContext.SpecTriplet.ActualResponse.String() + "\n"
+					if completedcontext.SpecTriplet.ActualResponse != nil {
+						response = completedcontext.SpecTriplet.ActualResponse.String() + "\n"
 					}
 				}
 			}
 
-			outputs[completedContext.ID] +=
+			outputs[completedcontext.ID] +=
 				fmt.Sprintf(
 					"%s%s%s %s\n%s\n",
 					Red,
 					location,
 					Reset,
-					completedContext.Err.Error(),
+					completedcontext.Err.Error(),
 					response,
 				)
 		}

@@ -1,25 +1,26 @@
 package main
 
 import (
-	"bufio"
 	"crypto/rand"
 	"math/big"
-	"net/http"
-	"os"
+
+	"github.com/tmornini/http-spec/file"
+	"github.com/tmornini/http-spec/logger"
+	"github.com/tmornini/http-spec/state"
 )
 
-func specFileProcessor(context context) {
-	context.log("02 spec-file-processor")
+func specFileProcessor(state state.State) {
+	logger.Log("02-spec-file-processor", state)
 
-	defer context.WaitGroup.Done()
+	defer state.WaitGroup.Done()
 
-	osFile, err := os.Open(context.Pathname)
-
-	if errorHandler(&context, err) {
-		context.ResultGathererChannel <- context
-
-		return
-	}
+	// osFile, err := os.Open(state.Pathname)
+	//
+	// if errorHandler(&state, err) {
+	// 	state.ResultGathererChannel <- state
+	//
+	// 	return
+	// }
 
 	space := new(big.Int).Exp(big.NewInt(62), big.NewInt(22), nil)
 	uuid, err := rand.Int(rand.Reader, space)
@@ -28,20 +29,30 @@ func specFileProcessor(context context) {
 		panic(err)
 	}
 
-	context.ID = uuid
+	state.ID = uuid
 
-	context.File = &file{
-		bufio.NewReader(osFile),
-		context.Pathname,
-		osFile,
-		0,
+	// state.File = &file{
+	// 	bufio.NewReader(osFile),
+	// 	state.Pathname,
+	// 	osFile,
+	// 	0,
+	// }
+
+	file, err := file.New(state.Pathname)
+
+	if err != nil {
+		state.Err = err
+		state.ResultGathererChannel <- state
+		return
 	}
 
-	context.Substitutions = map[string]string{}
+	defer file.OSFile.Close()
 
-	context.HTTPClient = &http.Client{}
+	state.File = file
 
-	specTripletIterator(&context)
+	// state.Substitutions = map[string]string{}
+	//
+	// state.HTTPClient = &http.Client{}
 
-	osFile.Close()
+	specTripletIterator(&state)
 }

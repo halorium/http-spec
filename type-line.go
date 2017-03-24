@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 )
 
@@ -72,15 +71,15 @@ func split(inputText string) (string, string) {
 	}
 }
 
-type line struct {
-	LineNumber  int
-	PathName    string
-	InputText   string
-	IOPrefix    string
-	Text        string
-	RegexpNames []string
-	Regexps     []*regexp.Regexp
-}
+// type line struct {
+// 	LineNumber  int
+// 	PathName    string
+// 	InputText   string
+// 	IOPrefix    string
+// 	Text        string
+// 	RegexpNames []string
+// 	Regexps     []*regexp.Regexp
+// }
 
 func (line *line) validate() error {
 	if line.isBlank() ||

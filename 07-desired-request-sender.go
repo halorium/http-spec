@@ -5,26 +5,27 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/tmornini/http-spec/logger"
+	"github.com/tmornini/http-spec/state"
 )
 
-func desiredRequestSender(context *context) {
-	context.log("07-desired-request-sender")
+func desiredRequestSender(state *state.State) {
+	logger.Log("07-desired-request-sender", state)
 
-	desiredRequest := context.SpecTriplet.DesiredRequest
-
-	body := ioutil.NopCloser(strings.NewReader(desiredRequest.Body() + "\n"))
+	body := ioutil.NopCloser(strings.NewReader(state.Spec.DesiredRequest.Body() + "\n"))
 
 	request, err := http.NewRequest(
-		desiredRequest.Method(),
-		context.URLPrefix+desiredRequest.Path(),
+		state.Spec.DesiredRequest.Method(),
+		state.URLPrefix+state.Spec.DesiredRequest.Path(),
 		body,
 	)
 
-	if errorHandler(context, err) {
+	if errorHandler(state, err) {
 		return
 	}
 
-	for _, headerLine := range context.SpecTriplet.DesiredRequest.HeaderLines {
+	for _, headerLine := range state.Spec.DesiredRequest.HeaderLines {
 		parts := strings.Split(headerLine.Text, ":")
 
 		key := strings.TrimSpace(parts[0])
@@ -33,13 +34,13 @@ func desiredRequestSender(context *context) {
 		request.Header.Add(key, value)
 	}
 
-	context.SpecTriplet.StartedAt = time.Now()
+	state.Spec.StartedAt = time.Now()
 
-	context.HTTPResponse, err = context.HTTPClient.Do(request)
+	state.HTTPResponse, err = state.HTTPClient.Do(request)
 
-	if errorHandler(context, err) {
+	if errorHandler(state, err) {
 		return
 	}
 
-	actualResponseReceiver(context)
+	actualResponseReceiver(state)
 }

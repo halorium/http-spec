@@ -8,7 +8,7 @@ http-spec intends to allow development of explicit and fast spec suites.
 If you have code that executes behind an HTTP API, then it is ideal to test
 that code via HTTP -- anything else is missing the point!
 
-Stated another way: APIs are contracts executed via HTTP. http-spec allows
+contextd another way: APIs are contracts executed via HTTP. http-spec allows
 API contracts to be written in and verified by HTTP.
 
 While low-level tests may still be required for edge cases such as networking
