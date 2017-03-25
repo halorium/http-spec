@@ -7,7 +7,7 @@ import (
 	"github.com/tmornini/http-spec/state"
 )
 
-func (line *Line) substitute(state *state.State) error {
+func (line *Line) Substitute(thisState *state.State) error {
 	parts := strings.Split(line.Text, state.SubstitutionIdentifier)
 
 	count := len(parts)
@@ -23,7 +23,7 @@ func (line *Line) substitute(state *state.State) error {
 	substitutedLine := parts[0]
 
 	for i := 1; i < count-1; i += 2 {
-		substitution, ok := state.Substitutions[parts[i]]
+		substitution, ok := thisState.Substitutions[parts[i]]
 
 		if !ok {
 			return fmt.Errorf("unknown tag: %v", parts[i])

@@ -16,7 +16,7 @@ type context struct {
 	Pathnames             []string
 	Pathname              string
 	WaitGroup             *sync.WaitGroup
-	ResultGathererChannel chan context
+	ResultsChannel chan context
 	Tag                   string
 	File                  *file
 	Substitutions         map[string]string
@@ -46,7 +46,7 @@ func newContext() *context {
 		// URLPrefix:             prefix,
 		Pathnames:             []string{},
 		WaitGroup:             &sync.WaitGroup{},
-		ResultGathererChannel: make(chan context),
+		ResultsChannel: make(chan context),
 		StartedAt:             time.Now(),
 		Substitutions:         map[string]string{},
 		HTTPClient:            &http.Client{},

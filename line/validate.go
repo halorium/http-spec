@@ -6,36 +6,36 @@ import (
 )
 
 func (line *Line) validate() error {
-	if line.isBlank() ||
-		line.isEmpty() ||
-		line.isRequest() ||
-		line.isResponse() ||
-		line.isComment() {
+	if line.IsBlank() ||
+		line.IsEmpty() ||
+		line.IsRequest() ||
+		line.IsResponse() ||
+		line.IsComment() {
 		return nil
 	}
 
-	return fmt.Errorf("malformed line: %s", line.String())
+	return fmt.Errorf("malformed line: %s", line.Text)
 }
 
-func (line *Line) isBlank() bool {
+func (line *Line) IsBlank() bool {
 	return line.InputText == ""
 }
 
-func (line *Line) isEmpty() bool {
+func (line *Line) IsEmpty() bool {
 	return line.InputText != "" && line.Text == ""
 }
 
-func (line *Line) isRequest() bool {
+func (line *Line) IsRequest() bool {
 	return line.IOPrefix != "" &&
 		strings.HasPrefix(string(line.IOPrefix[0]), ">")
 }
 
-func (line *Line) isResponse() bool {
+func (line *Line) IsResponse() bool {
 	return line.IOPrefix != "" &&
 		strings.HasPrefix(string(line.IOPrefix[0]), "<")
 }
 
-func (line *Line) isComment() bool {
+func (line *Line) IsComment() bool {
 	return line.IOPrefix != "" &&
 		strings.HasPrefix(string(line.IOPrefix[0]), "#")
 }

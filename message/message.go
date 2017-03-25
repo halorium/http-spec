@@ -6,9 +6,10 @@ import (
 )
 
 type Message struct {
-	Header    *Header
-	BlankLine *line.Line
-	Body      *Body
+	RequestLine *line.Line
+	HeaderLines []*line.Line
+	BlankLine   *line.Line
+	BodyLines   []*line.Line
 }
 
 func New(state *state.State) (*Message, error) {

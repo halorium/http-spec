@@ -2,7 +2,7 @@ package file
 
 import "strings"
 
-func (f *file) ReadLine() (string, error) {
+func (f *File) ReadLine() (string, error) {
 	inputText, err := f.ReadString(byte('\n'))
 
 	if err != nil {

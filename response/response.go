@@ -1,9 +1,12 @@
 package response
 
-import "github.com/tmornini/http-spec/state"
+import (
+	"github.com/tmornini/http-spec/message"
+	"github.com/tmornini/http-spec/state"
+)
 
 type Response struct {
-	*message
+	*message.Message
 }
 
 func New(state *state.State) (*Response, error) {

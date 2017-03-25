@@ -9,14 +9,14 @@ import (
 func (message *Message) allLines() []*line.Line {
 	var lines []*line.Line
 
-	lines = append(lines, message.FirstLine)
+	lines = append(lines, message.RequestLine)
 	lines = append(lines, message.HeaderLines...)
 	lines = append(lines, message.BodyLines...)
 
 	return lines
 }
 
-func (message *Message) allHeaderAndBodyLines() []*line.Line {
+func (message *Message) AllHeaderAndBodyLines() []*line.Line {
 	var lines []*line.Line
 
 	lines = append(lines, message.HeaderLines...)

@@ -1,6 +1,7 @@
 package line
 
 import (
+	"fmt"
 	"regexp"
 
 	"github.com/tmornini/http-spec/state"
@@ -17,5 +18,17 @@ type Line struct {
 }
 
 func New(state *state.State) (*Line, error) {
-	return newFromFile(state)
+	return NewFromFile(state)
+}
+
+func (line *Line) String() string {
+	return fmt.Sprintf("%s %s", line.Location(), line.Content())
+}
+
+func (line *Line) Location() string {
+	return fmt.Sprintf("[%s:%3d]", line.PathName, line.LineNumber)
+}
+
+func (line *Line) Content() string {
+	return fmt.Sprintf("%s %s", line.IOPrefix, line.Text)
 }

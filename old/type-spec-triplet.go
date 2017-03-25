@@ -27,8 +27,8 @@ package main
 // 				result,
 // 				fmt.Sprintf(
 // 					"%s:%d",
-// 					specTriplet.DesiredRequest.FirstLine.PathName,
-// 					specTriplet.DesiredRequest.FirstLine.LineNumber,
+// 					specTriplet.DesiredRequest.RequestLine.PathName,
+// 					specTriplet.DesiredRequest.RequestLine.LineNumber,
 // 				),
 // 			)
 // 	}
@@ -39,7 +39,7 @@ package main
 // 				result,
 // 				fmt.Sprintf(
 // 					"%d",
-// 					specTriplet.ExpectedResponse.FirstLine.LineNumber,
+// 					specTriplet.ExpectedResponse.RequestLine.LineNumber,
 // 				),
 // 			)
 // 	}

@@ -17,21 +17,21 @@ type request struct {
 }
 
 func (request *request) Method() string {
-	return strings.Split(request.FirstLine.Text, " ")[0]
+	return strings.Split(request.RequestLine.Text, " ")[0]
 }
 
 func (request *request) Path() string {
-	return strings.Split(request.FirstLine.Text, " ")[1]
+	return strings.Split(request.RequestLine.Text, " ")[1]
 }
 
 func (request *request) Version() string {
-	return strings.Split(request.FirstLine.Text, " ")[2]
+	return strings.Split(request.RequestLine.Text, " ")[2]
 }
 
 func (request *request) String() string {
 	lineStrings := []string{}
 
-	lineStrings = append(lineStrings, request.FirstLine.String())
+	lineStrings = append(lineStrings, request.RequestLine.String())
 
 	for _, l := range request.HeaderLines {
 		lineStrings = append(lineStrings, l.String())

@@ -1,9 +1,17 @@
 package main
 
-func expectedResponseSubstituter(context *context) {
-	context.log("06 expected-response-substituter")
+import (
+	"github.com/tmornini/http-spec/logger"
+	"github.com/tmornini/http-spec/spec"
+	"github.com/tmornini/http-spec/state"
+)
 
-	context.SpecTriplet.ExpectedResponse.substitute(context)
+func expectedResponseSubstituter(state *state.State) {
+	logger.Log("06-expected-response-substituter", state)
 
-	desiredRequestSender(context)
+	thisSpec := state.Spec.(*spec.Spec)
+
+	thisSpec.ExpectedResponse.Substitute(state)
+
+	desiredRequestSender(state)
 }

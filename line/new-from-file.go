@@ -2,7 +2,9 @@ package line
 
 import "github.com/tmornini/http-spec/state"
 
-func newFromFile(state *state.State) (*Line, error) {
+func NewFromFile(state *state.State) (*Line, error) {
+	var line *Line
+
 	for {
 		inputText, err := state.File.ReadLine()
 
@@ -10,13 +12,13 @@ func newFromFile(state *state.State) (*Line, error) {
 			return nil, err
 		}
 
-		line, err := newFromText(inputText, state)
+		line, err = NewFromText(state.File.PathName, state.File.LineNumber, inputText)
 
 		if err != nil {
 			return nil, err
 		}
 
-		if !line.isComment() {
+		if !line.IsComment() {
 			break
 		}
 	}

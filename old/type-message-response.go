@@ -17,17 +17,17 @@ type response struct {
 }
 
 func (response *response) Version() string {
-	return strings.Split(response.FirstLine.Text, " ")[0]
+	return strings.Split(response.RequestLine.Text, " ")[0]
 }
 
 func (response *response) StatusCode() string {
-	return strings.Split(response.FirstLine.Text, " ")[1]
+	return strings.Split(response.RequestLine.Text, " ")[1]
 }
 
 func (response *response) ReasonPhrase() string {
 	return strings.Join(
 		strings.Split(
-			response.FirstLine.Text, " ",
+			response.RequestLine.Text, " ",
 		)[2:],
 		" ",
 	)
@@ -36,7 +36,7 @@ func (response *response) ReasonPhrase() string {
 func (response *response) String() string {
 	lineStrings := []string{}
 
-	lineStrings = append(lineStrings, response.FirstLine.Content())
+	lineStrings = append(lineStrings, response.RequestLine.Content())
 
 	for _, l := range response.HeaderLines {
 		content := l.Content()

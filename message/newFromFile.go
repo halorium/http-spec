@@ -2,7 +2,6 @@ package message
 
 import (
 	"io"
-	"strings"
 
 	"github.com/tmornini/http-spec/line"
 	"github.com/tmornini/http-spec/state"
@@ -10,26 +9,27 @@ import (
 
 func NewFromFile(state *state.State) (*Message, error) {
 	message := &Message{}
+	var err error
 
-	err := readFirstLine(message)
-
-	if err != nil {
-		return nil, err
-	}
-
-	err := readHostLine(message)
+	err = readRequestLine(message, state)
 
 	if err != nil {
 		return nil, err
 	}
 
-	err := readHeaderLines(message)
+	// err = readHostLine(message, state)
+	//
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	err = readHeaderLines(message, state)
 
 	if err != nil {
 		return nil, err
 	}
 
-	err := readBodyLines(message)
+	err = readBodyLines(message, state)
 
 	if err != nil {
 		return nil, err
@@ -38,66 +38,77 @@ func NewFromFile(state *state.State) (*Message, error) {
 	return message, nil
 }
 
-func readFirstLine(message *Message) error {
-	firstLine, err := line.newFromFile(state)
+func readRequestLine(message *Message, state *state.State) error {
+	requestLine, err := line.NewFromFile(state)
 
 	if err != nil {
 		return err
 	}
 
-	lineArgs := strings.Split(firstLine.Text, " ")
+	message.RequestLine = requestLine
 
-	message.Header.Verb = lineArgs[0]
-	message.Header.URI = lineArgs[1]
-	message.Header.Protocol = lineArgs[2]
+	return nil
+
+	// lineArgs := strings.Split(requestLine.Text, " ")
+	//
+	// message.Header.Verb = lineArgs[0]
+	// message.Header.URI = lineArgs[1]
+	// message.Header.Protocol = lineArgs[2]
 }
 
-func readHostLine(message *Message) error {
-	hostLine, err := line.newFromFile(state)
+// func readHostLine(message *Message, state *state.State) error {
+// 	hostLine, err := line.NewFromFile(state)
+//
+// 	if err != nil {
+// 		return err
+// 	}
+//
+//
+// 	lineArgs := strings.Split(hostLine.Text, " ")
+//
+// 	message.Header.Host = lineArgs[1]
+// }
 
-	if err != nil {
-		return err
-	}
-
-	lineArgs := strings.Split(hostLine.Text, " ")
-
-	message.Header.Host = lineArgs[1]
-}
-
-func readHeaderLines(message *Message) error {
+func readHeaderLines(message *Message, state *state.State) error {
 	var headerLine *line.Line
+	var err error
 
 	for {
-		headerLine, err = line.newFromFile(state)
+		headerLine, err = line.NewFromFile(state)
 
 		if err != nil {
 			return err
 		}
 
-		if headerLine.isEmpty() {
+		if headerLine.IsEmpty() {
 			message.BlankLine = headerLine
 
 			break
 		}
 
-		message.Header.Lines = append(message.Header.Lines, headerLine)
+		message.HeaderLines = append(message.HeaderLines, headerLine)
 	}
+
+	return nil
 }
 
-func readBodyLines(message *Message) error {
-	var bodyLine *line
+func readBodyLines(message *Message, state *state.State) error {
+	var bodyLine *line.Line
+	var err error
 
 	for {
-		bodyLine, err = line.newFromFile(state)
+		bodyLine, err = line.NewFromFile(state)
 
-		if err == io.EOF || bodyLine.isBlank() {
+		if err == io.EOF || bodyLine.IsBlank() {
 			break
 		}
 
-		if err != nil {
-			return err
-		}
+		// if err != nil {
+		// 	return err
+		// }
 
-		message.Body.Lines = append(message.Body.Lines, bodyLine)
+		message.BodyLines = append(message.BodyLines, bodyLine)
 	}
+
+	return err
 }

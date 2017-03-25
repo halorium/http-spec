@@ -11,18 +11,17 @@ import (
 	"github.com/tmornini/http-spec/state"
 )
 
-func specTripletIterator(state *state.State) {
-	logger.Log("03-spec-triplet-iterator", state)
+func specIterator(state *state.State) {
+	logger.Log("03-spec-iterator", state)
 
 	for {
-		state.Err = nil
+		state.Error = nil
 
 		// desiredRequest, err := requestFromFile(state)
 		desiredRequest, err := request.New(state)
 
 		if err != nil {
-			state.Err = err
-			state.ResultGathererChannel <- state
+			state.Error = err
 			return
 		}
 
@@ -30,14 +29,15 @@ func specTripletIterator(state *state.State) {
 		expectedResponse, err := response.New(state)
 
 		if err != nil && err != io.EOF {
-			state.Err = err
-			state.ResultGathererChannel <- state
+			state.Error = err
 			return
 		}
 
-		state.Spec = spec.New()
-		state.Spec.DesiredRequest = desiredRequest
-		state.Spec.ExpectedResponse = expectedResponse
+		newSpec := spec.New()
+		newSpec.DesiredRequest = desiredRequest
+		newSpec.ExpectedResponse = expectedResponse
+
+		state.Spec = newSpec
 
 		// state.SpecTriplet = &specTriplet{
 		// 	DesiredRequest:   desiredRequest,
@@ -46,7 +46,7 @@ func specTripletIterator(state *state.State) {
 
 		desiredRequestSubstitor(state)
 
-		state.Spec.Duration = time.Since(state.Spec.StartedAt)
-		state.ResultGathererChannel <- *state
+		newSpec.Duration = time.Since(newSpec.StartedAt)
+		state.ResultsChannel <- *state
 	}
 }

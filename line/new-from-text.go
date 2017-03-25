@@ -1,15 +1,15 @@
 package line
 
-import "github.com/tmornini/http-spec/state"
-
 // state.File.PathName, state.File.LineNumber,
 // pathName string, lineNumber int,
-func newFromText(inputText string, state *state.State) (*Line, error) {
+// line.NewFromText("response", responseLineNumber, statusLineText)
+// newLineFromText(context.File.PathName, context.File.LineNumber, inputText)
+func NewFromText(pathName string, lineNumber int, inputText string) (*Line, error) {
 	ioPrefix, text := split(inputText)
 
 	line := &Line{
-		PathName:   state.File.PathName,
-		LineNumber: state.File.LineNumber,
+		PathName:   pathName,
+		LineNumber: lineNumber,
 		InputText:  inputText,
 		IOPrefix:   ioPrefix,
 		Text:       text,

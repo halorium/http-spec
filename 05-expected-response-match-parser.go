@@ -4,15 +4,20 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/tmornini/http-spec/logger"
+	"github.com/tmornini/http-spec/matcher"
+	"github.com/tmornini/http-spec/spec"
+	"github.com/tmornini/http-spec/state"
 )
 
-func expectedResponseMatchParser(context *context) {
-	context.log("05 expected-response-match-parser")
+func expectedResponseMatchParser(thisState *state.State) {
+	logger.Log("05-expected-response-match-parser", thisState)
 
-	expectedResponse := context.SpecTriplet.ExpectedResponse
+	thisSpec := thisState.Spec.(*spec.Spec)
 
-	for _, line := range expectedResponse.allHeaderAndBodyLines() {
-		parts := strings.Split(line.Text, regexpIdentifier)
+	for _, line := range thisSpec.ExpectedResponse.AllHeaderAndBodyLines() {
+		parts := strings.Split(line.Text, state.RegexpIdentifier)
 
 		count := len(parts)
 
@@ -21,87 +26,95 @@ func expectedResponseMatchParser(context *context) {
 		}
 
 		if count == 0 || count == 2 || count == 3 || (count-4)%3 != 0 {
-			errorHandler(
-				context,
-				fmt.Errorf(
-					"regexp must be formed %soptional-capture-name%sregexp%s",
-					regexpIdentifier,
-					regexpIdentifier,
-					regexpIdentifier,
-				),
-			)
-
+			// errorHandler(
+			// 	state,
+			// fmt.Errorf(
+			// 	"regexp must be formed %soptional-capture-name%sregexp%s",
+			// 	state.RegexpIdentifier,
+			// 	state.RegexpIdentifier,
+			// 	state.RegexpIdentifier,
+			// ),
+			// )
+			thisState.Error = fmt.Errorf("regexp must be formed %soptional-capture-name%sregexp%s", state.RegexpIdentifier, state.RegexpIdentifier, state.RegexpIdentifier)
 			return
 		}
 
-		var re *regexp.Regexp
+		var reg *regexp.Regexp
 		var err error
 
 		if parts[0] != "" {
-			re, err = regexp.Compile(regexp.QuoteMeta(parts[0]))
+			reg, err = regexp.Compile(regexp.QuoteMeta(parts[0]))
 
-			if errorHandler(context, err) {
+			if err != nil {
+				thisState.Error = err
 				return
 			}
 
 			line.RegexpNames = append(line.RegexpNames, ":prefix")
-			line.Regexps = append(line.Regexps, re)
+			line.Regexps = append(line.Regexps, reg)
 		}
 
+		matchers := matcher.New()
+
 		for i := 1; i < count-1; i += 3 {
-			reString := "("
+			reg = matchers[parts[i+1]]
 
-			switch parts[i+1] {
-			case ":date":
-				reString +=
-					"(Mon|Tue|Wed|Thu|Fri|Sat|Sun), " +
-						"(0\\d|1\\d|2\\d|3[01]) " +
-						"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) " +
-						"2\\d{3} " +
-						"(0\\d|1\\d|2[0-3]):" +
-						"(0\\d|1\\d|2\\d|3\\d|4\\d|5\\d):" +
-						"(0\\d|1\\d|2\\d|3\\d|4\\d|5\\d) " +
-						"(A|M|N|Y|Z|UT|GMT|[A-Z]{3}|[+-](0\\d|1[012]))"
-			case ":b62:22":
-				reString += "[0-9A-Za-z]{22}"
-			case ":uuid":
-				reString +=
-					"[[:xdigit:]]{8}-" +
-						"[[:xdigit:]]{4}-" +
-						"[[:xdigit:]]{4}-" +
-						"[[:xdigit:]]{4}-" +
-						"[[:xdigit:]]{12}"
-			default:
-				reString += parts[i+1]
+			if reg == nil {
+				reg, err = regexp.Compile("(" + parts[i+1] + ")")
+
+				if err != nil {
+					thisState.Error = err
+					return
+				}
 			}
 
-			reString += ")"
+			// reString := "("
+			//
+			// switch parts[i+1] {
+			// case ":date":
+			// 	re = matchers[":date"]
+			// case ":b62:22":
+			// 	reString += "[0-9A-Za-z]{22}"
+			// case ":uuid":
+			// 	reString +=
+			// 		"[[:xdigit:]]{8}-" +
+			// 			"[[:xdigit:]]{4}-" +
+			// 			"[[:xdigit:]]{4}-" +
+			// 			"[[:xdigit:]]{4}-" +
+			// 			"[[:xdigit:]]{12}"
+			// default:
+			// 	reString += parts[i+1]
+			// }
+			//
+			// reString += ")"
 
-			re, err = regexp.Compile(reString)
-
-			if errorHandler(context, err) {
-				return
-			}
+			// re, err = regexp.Compile(reString)
+			//
+			// if errorHandler(state, err) {
+			// 	return
+			// }
 
 			line.RegexpNames = append(line.RegexpNames, parts[i])
-			line.Regexps = append(line.Regexps, re)
+			line.Regexps = append(line.Regexps, reg)
 
 			if parts[i+2] != "" {
-				re, err = regexp.Compile(regexp.QuoteMeta(parts[i+2]))
+				reg, err = regexp.Compile(regexp.QuoteMeta(parts[i+2]))
 
-				if errorHandler(context, err) {
+				if err != nil {
+					thisState.Error = err
 					return
 				}
 
 				line.RegexpNames = append(line.RegexpNames, ":postfix")
-				line.Regexps = append(line.Regexps, re)
+				line.Regexps = append(line.Regexps, reg)
 			}
 		}
 
-		if errorHandler(context, err) {
+		if err != nil {
+			thisState.Error = err
 			return
 		}
 	}
 
-	expectedResponseSubstituter(context)
+	expectedResponseSubstituter(thisState)
 }

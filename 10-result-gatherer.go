@@ -5,10 +5,14 @@ import (
 	"math/big"
 	"os"
 	"time"
+
+	"github.com/tmornini/http-spec/logger"
+	"github.com/tmornini/http-spec/spec"
+	"github.com/tmornini/http-spec/state"
 )
 
-func resultGatherer(context context) {
-	context.log("10 result-gatherer")
+func resultGatherer(thisState state.State) {
+	logger.Log("10-result-gatherer", thisState)
 
 	success := true
 
@@ -17,17 +21,18 @@ func resultGatherer(context context) {
 
 	outputs := map[*big.Int]string{}
 
-	for completedcontext := range context.ResultGathererChannel {
-		if completedcontext.Err == nil {
+	for completedState := range thisState.ResultsChannel {
+		if completedState.Error == nil {
 			// SUCCESS
+			thisSpec := completedState.Spec.(*spec.Spec)
 			successCount++
-			outputs[completedcontext.ID] +=
+			outputs[completedState.ID] +=
 				fmt.Sprintf(
 					"%s%s%s %s\n",
 					Green,
-					completedcontext.SpecTriplet.String(),
+					thisSpec.String(),
 					Reset,
-					completedcontext.SpecTriplet.Duration.String(),
+					thisSpec.Duration.String(),
 				)
 		} else {
 			// FAILURE
@@ -37,38 +42,39 @@ func resultGatherer(context context) {
 			location := ""
 			response := ""
 
-			if completedcontext.File == nil {
+			if completedState.File == nil {
 				// file open failure
-				location += "[" + completedcontext.Pathname + "]"
+				location += "[" + completedState.Pathname + "]"
 			} else {
-				if completedcontext.SpecTriplet == nil {
+				if completedState.Spec == nil {
 					// request/response parsing failure
-					location += completedcontext.File.String()
+					location += completedState.File.String()
 				} else {
 					// request/response matching failure
+					thisSpec := completedState.Spec.(*spec.Spec)
 					location +=
-						completedcontext.SpecTriplet.String() + " " +
-							completedcontext.SpecTriplet.Duration.String()
+						thisSpec.String() + " " +
+							thisSpec.Duration.String()
 
-					if completedcontext.SpecTriplet.ActualResponse != nil {
-						response = completedcontext.SpecTriplet.ActualResponse.String() + "\n"
+					if thisSpec.ActualResponse != nil {
+						response = thisSpec.ActualResponse.String() + "\n"
 					}
 				}
 			}
 
-			outputs[completedcontext.ID] +=
+			outputs[completedState.ID] +=
 				fmt.Sprintf(
 					"%s%s%s %s\n%s\n",
 					Red,
 					location,
 					Reset,
-					completedcontext.Err.Error(),
+					completedState.Error.Error(),
 					response,
 				)
 		}
 	}
 
-	duration := time.Since(context.StartedAt)
+	duration := time.Since(thisState.StartedAt)
 
 	fmt.Println()
 

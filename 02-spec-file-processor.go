@@ -17,7 +17,7 @@ func specFileProcessor(state state.State) {
 	// osFile, err := os.Open(state.Pathname)
 	//
 	// if errorHandler(&state, err) {
-	// 	state.ResultGathererChannel <- state
+	// 	state.ResultsChannel <- state
 	//
 	// 	return
 	// }
@@ -41,8 +41,8 @@ func specFileProcessor(state state.State) {
 	file, err := file.New(state.Pathname)
 
 	if err != nil {
-		state.Err = err
-		state.ResultGathererChannel <- state
+		state.Error = err
+		state.ResultsChannel <- state
 		return
 	}
 
@@ -54,5 +54,5 @@ func specFileProcessor(state state.State) {
 	//
 	// state.HTTPClient = &http.Client{}
 
-	specTripletIterator(&state)
+	specIterator(&state)
 }

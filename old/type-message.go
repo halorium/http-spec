@@ -3,14 +3,14 @@ package main
 import "strings"
 
 type message struct {
-	FirstLine   *line
+	RequestLine   *line
 	HeaderLines []*line
 	BlankLine   *line
 	BodyLines   []*line
 }
 
 // func messageFromFile(context *context) (*message, error) {
-// 	firstLine, err := newLineFromFile(context)
+// 	RequestLine, err := newLineFromFile(context)
 //
 // 	if err != nil {
 // 		return nil, err
@@ -54,7 +54,7 @@ type message struct {
 // 	}
 //
 // 	return &message{
-// 		firstLine,
+// 		RequestLine,
 // 		headerLines,
 // 		emptyLine,
 // 		bodyLines,
@@ -64,20 +64,20 @@ type message struct {
 func (message *message) allLines() []*line {
 	var allLines []*line
 
-	allLines = append(allLines, message.FirstLine)
+	allLines = append(allLines, message.RequestLine)
 	allLines = append(allLines, message.HeaderLines...)
 	allLines = append(allLines, message.BodyLines...)
 
 	return allLines
 }
 
-func (message *message) allHeaderAndBodyLines() []*line {
-	var allHeaderAndBodyLines []*line
+func (message *message) AllHeaderAndBodyLines() []*line {
+	var AllHeaderAndBodyLines []*line
 
-	allHeaderAndBodyLines = append(allHeaderAndBodyLines, message.HeaderLines...)
-	allHeaderAndBodyLines = append(allHeaderAndBodyLines, message.BodyLines...)
+	AllHeaderAndBodyLines = append(AllHeaderAndBodyLines, message.HeaderLines...)
+	AllHeaderAndBodyLines = append(AllHeaderAndBodyLines, message.BodyLines...)
 
-	return allHeaderAndBodyLines
+	return AllHeaderAndBodyLines
 }
 
 func (message *message) substitute(context *context) {

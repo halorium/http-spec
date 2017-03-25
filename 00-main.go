@@ -38,7 +38,7 @@ func main() {
 
 	// fmt.Println(flag.Args())
 
-	state := state.New()
+	thisState := state.New()
 
 	// context := &context{
 	// 	LogFunctions:          false,
@@ -46,7 +46,7 @@ func main() {
 	// 	URLPrefix:             prefix,
 	// 	Pathnames:             flag.Args(),
 	// 	WaitGroup:             &sync.WaitGroup{},
-	// 	ResultGathererChannel: make(chan context),
+	// 	ResultsChannel: make(chan context),
 	// 	StartedAt:             startedAt,
 	// }
 
@@ -54,19 +54,19 @@ func main() {
 
 	// for i, path := range os.Args {
 	// 	if i != 0 {
-	// 		state.Pathnames = append(state.Pathnames, path)
+	// 		thisState.Pathnames = append(thisState.Pathnames, path)
 	// 	}
 	// }
 
-	logger.Log("00-main", state)
+	logger.Log("00-main", thisState)
 
-	go resultGatherer(*state)
+	go resultGatherer(*thisState)
 
-	specFileScatter(state)
+	specFileScatter(thisState)
 
-	state.WaitGroup.Wait()
+	thisState.WaitGroup.Wait()
 
-	close(state.ResultGathererChannel)
+	close(thisState.ResultsChannel)
 
 	select {}
 }

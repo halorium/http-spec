@@ -21,7 +21,7 @@ func New() *Spec {
 	return &Spec{}
 }
 
-func (spec *Spec) isRequestOnly() bool {
+func (spec *Spec) IsRequestOnly() bool {
 	return spec.ExpectedResponse == nil
 }
 
@@ -34,8 +34,8 @@ func (spec *Spec) String() string {
 				result,
 				fmt.Sprintf(
 					"%s:%d",
-					spec.DesiredRequest.FirstLine.PathName,
-					spec.DesiredRequest.FirstLine.LineNumber,
+					spec.DesiredRequest.RequestLine.PathName,
+					spec.DesiredRequest.RequestLine.LineNumber,
 				),
 			)
 	}
@@ -46,7 +46,7 @@ func (spec *Spec) String() string {
 				result,
 				fmt.Sprintf(
 					"%d",
-					spec.ExpectedResponse.FirstLine.LineNumber,
+					spec.ExpectedResponse.RequestLine.LineNumber,
 				),
 			)
 	}

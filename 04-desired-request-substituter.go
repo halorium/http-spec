@@ -2,15 +2,18 @@ package main
 
 import (
 	"github.com/tmornini/http-spec/logger"
+	"github.com/tmornini/http-spec/spec"
 	"github.com/tmornini/http-spec/state"
 )
 
 func desiredRequestSubstitor(state *state.State) {
-	logger.Log("04-desired-request-substituter")
+	logger.Log("04-desired-request-substituter", state)
 
-	state.Spec.DesiredRequest.substitute(state)
+	thisSpec := state.Spec.(spec.Spec)
 
-	if state.Spec.isRequestOnly() {
+	thisSpec.DesiredRequest.Substitute(state)
+
+	if thisSpec.IsRequestOnly() {
 		desiredRequestSender(state)
 
 		return
